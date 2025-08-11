@@ -1111,4 +1111,48 @@ theorem exists_isOpen_mem_isCompact_closure (x : X) :
 
 end R1Space
 
+section USSpace
+
+/-- A topological space has *unique sequential limits* (a.k.a. is a US space),
+provided the limit of any sequence is unique. -/
+class USSpace (X : Type*) [TopologicalSpace X] : Prop where
+  us : ∀ x y : X, ∀ f : ℕ → X, Tendsto f atTop (𝓝 x) → Tendsto f atTop (𝓝 y) → x = y
+
+export USSpace (us)
+
+instance [USSpace X] : T1Space X := by
+  apply ((t1Space_TFAE X).out 1 0 :).mp
+  intro x
+  apply closure_subset_iff_isClosed.mp
+  simp
+  intro y y_in_cl_x
+  apply us y x (fun _ ↦ x)
+  · intro U U_nhd_y
+    simp
+    use 0
+    simp
+    apply Set.inter_singleton_nonempty.mp
+    apply mem_closure_iff_nhds.mp y_in_cl_x
+    exact U_nhd_y
+  · exact tendsto_const_nhds
+
+
+
+  -- apply ((t1Space_TFAE X).out 1 0 :).mp
+  -- intro z
+  -- apply isClosed_of_closure_subset
+  -- simp
+  -- intro y y_in_cl_z
+  -- apply us y z (fun _ ↦ z)
+  -- · intro U U_nhd_z
+  --   simp
+  --   use 0
+  --   simp
+  --   apply Set.inter_singleton_nonempty.mp
+  --   apply mem_closure_iff_nhds.mp y_in_cl_z
+  --   exact U_nhd_z
+  -- · exact tendsto_const_nhds
+
+end USSpace
+
 end Separation
